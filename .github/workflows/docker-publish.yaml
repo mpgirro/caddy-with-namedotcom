@@ -1,26 +1,12 @@
 name: Publish Docker images
 
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 on:
   push:
     branches: [ "master" ]
-    # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
-  pull_request:
-    branches: [ "master" ]
-
-env:
-  # Use docker.io for Docker Hub if empty
-  REGISTRY: ghcr.io
-  # github.repository as <account>/<repo>
-  IMAGE_NAME: ${{ github.repository }}
+  workflow_dispatch:
 
 jobs:
-  build:
+  publish-image:
 
     runs-on: ubuntu-latest
     permissions:
@@ -54,13 +40,27 @@ jobs:
 
       # Login against a Docker registry except on PR
       # https://github.com/docker/login-action
-      - name: Log into registry ${{ env.REGISTRY }}
+      - name: Login to Docker Hub
         if: github.event_name != 'pull_request'
         uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      
+      - name: Login to Github Container Registry (GHCR)
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract Caddy version
+        id: version-extractor
+        run: |
+          CADDY_VERSION=$(grep -oP '(\d+\.\d+\.\d+(-\w+(-\w+)*)?)' ${{ matrix.dockerfile }} | grep -vP 'builder' | head -n 1)
+          echo "Extracted Caddy version is: $CADDY_VERSION"
+          echo "CADDY_VERSION=$CADDY_VERSION" >> "$GITHUB_OUTPUT"
 
       # Extract metadata (tags, labels) for Docker
       # https://github.com/docker/metadata-action
@@ -68,13 +68,19 @@ jobs:
         id: meta
         uses: docker/metadata-action@8e5442c4ef9f78752691e2d8f8d19755c6f78e81 # v5.5.1
         with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
-      - name: Extract Caddy version
-        id: version-extractor
-        run: |
-          CADDY_VERSION=$(grep -oP 'caddy:\K[^\s-]+' ${{ matrix.dockerfile }} | head -n 1)
-          echo "CADDY_VERSION=$CADDY_VERSION" >> "$GITHUB_OUTPUT"
+          # list of Docker images to use as base name for tags
+          images: |
+            ${{ vars.DOCKERHUB_USERNAME }}/caddy-with-namedotcom
+            ghcr.io/${{ github.repository_owner }}/caddy-with-namedotcom            
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=semver,pattern={{version}},value=${{ steps.version-extractor.outputs.CADDY_VERSION }}
+            type=semver,pattern={{major}}.{{minor}},value=${{ steps.version-extractor.outputs.CADDY_VERSION }}
+            type=semver,pattern={{major}},value=${{ steps.version-extractor.outputs.CADDY_VERSION }}
+          #  type=sha  
+          #  type=schedule
+          #  type=ref,event=branch
+          #  type=ref,event=pr    
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
@@ -85,10 +91,7 @@ jobs:
           context: .
           file: ${{ matrix.dockerfile }}
           push: ${{ github.event_name != 'pull_request' }}
-          #tags: ${{ steps.meta.outputs.tags }}
-          tags: |
-            ghcr.io/${{ github.repository_owner }}/caddy-with-namedotcom:${{ steps.version-extractor.outputs.CADDY_VERSION }}
-            ghcr.io/${{ github.repository_owner }}/caddy-with-namedotcom:latest
+          tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
