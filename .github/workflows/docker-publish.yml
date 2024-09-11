@@ -67,6 +67,12 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
+      - name: Extract Caddy version
+        id: version-extractor
+        run: |
+          CADDY_VERSION=$(grep -oP 'caddy:\K[^\s-]+' Dockerfile | head -n 1)
+          echo "CADDY_VERSION=$CADDY_VERSION" >> "$GITHUB_OUTPUT"
+
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
       - name: Build and push Docker image
@@ -75,7 +81,10 @@ jobs:
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}
-          tags: ${{ steps.meta.outputs.tags }}
+          #tags: ${{ steps.meta.outputs.tags }}
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/caddy-with-namedotcom:${{ steps.version-extractor.outputs.CADDY_VERSION }}
+            ghcr.io/${{ github.repository_owner }}/caddy-with-namedotcom:latest
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
