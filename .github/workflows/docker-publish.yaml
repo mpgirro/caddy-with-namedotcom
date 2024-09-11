@@ -19,7 +19,6 @@ env:
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
 
-
 jobs:
   build:
 
@@ -31,6 +30,10 @@ jobs:
       # with sigstore/fulcio when running outside of PRs.
       id-token: write
 
+    strategy:
+      matrix:
+        dockerfile: [Dockerfile, Dockerfile-alpine]
+  
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -70,7 +73,7 @@ jobs:
       - name: Extract Caddy version
         id: version-extractor
         run: |
-          CADDY_VERSION=$(grep -oP 'caddy:\K[^\s-]+' Dockerfile | head -n 1)
+          CADDY_VERSION=$(grep -oP 'caddy:\K[^\s-]+' ${{ matrix.dockerfile }} | head -n 1)
           echo "CADDY_VERSION=$CADDY_VERSION" >> "$GITHUB_OUTPUT"
 
       # Build and push Docker image with Buildx (don't push on PR)
@@ -80,6 +83,7 @@ jobs:
         uses: docker/build-push-action@5cd11c3a4ced054e52742c5fd54dca954e0edd85 # v6.7.0
         with:
           context: .
+          file: ${{ matrix.dockerfile }}
           push: ${{ github.event_name != 'pull_request' }}
           #tags: ${{ steps.meta.outputs.tags }}
           tags: |
