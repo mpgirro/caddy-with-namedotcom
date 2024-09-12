@@ -1,5 +1,14 @@
 {
   "extends": [
     "github>mpgirro/renovate-config:docker"
+  ],
+  "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "updateTypes": ["major", "minor", "patch"],
+      "automerge": true,
+      "automergeType": "branch",
+      "ignoreTests": true
+    }
   ]
 }
