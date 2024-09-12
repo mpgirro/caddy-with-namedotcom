@@ -6,7 +6,8 @@
     {
       "matchDatasources": ["docker"],
       "updateTypes": ["major", "minor", "patch"],
-      "automerge": true
+      "automerge": true,
+      "ignoreTests": true
     }
   ]
 }
