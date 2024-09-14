@@ -3,6 +3,9 @@ name: Publish Docker images
 on:
   push:
     branches: [ "master" ]
+    # Trigger on master branch only if changes are detected in the docker directory
+    paths:
+      - docker/**
   workflow_dispatch:
 
 jobs:
@@ -18,7 +21,7 @@ jobs:
 
     strategy:
       matrix:
-        dockerfile: [Dockerfile, Dockerfile-alpine]
+        dockerfile: [docker/Dockerfile, docker/Dockerfile-alpine]
   
     steps:
       - name: Checkout repository
