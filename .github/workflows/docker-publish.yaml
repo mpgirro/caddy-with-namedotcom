@@ -13,7 +13,7 @@ jobs:
 
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
       # This is used to complete the identity challenge
       # with sigstore/fulcio when running outside of PRs.
@@ -118,3 +118,19 @@ jobs:
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+
+      - name: Check if this job builds the default version
+        id: check-default-build
+        run: |
+          IS_DEFAULT_BUILD=$(echo '${{ steps.version-extractor.outputs.CADDY_VERSION }}' | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$' && echo true || echo false)
+          echo "Is default version build job: $IS_DEFAULT_BUILD"
+          echo "IS_DEFAULT_BUILD=$IS_DEFAULT_BUILD" >> "$GITHUB_OUTPUT"
+
+      - uses: softprops/action-gh-release@v2.0.8
+        if: ${{ steps.check-default-build.outputs.IS_DEFAULT_BUILD == 'true' }}
+        with:
+          tag_name: ${{ steps.version-extractor.outputs.CADDY_VERSION }}
+          body: |
+            Update Caddy base image version to ${{ steps.version-extractor.outputs.CADDY_VERSION }}
+          generate_release_notes: true
+          make_latest: true
