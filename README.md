@@ -4,7 +4,7 @@ A Docker image for [Caddy](https://github.com/caddyserver/caddy) with the [Name.
 
 ## Overview
 
-Caddy is a powerful and flexible web server, but its official Docker images do not include DNS provider moules by default. To solve ACME [DNS-01 challenges](https://letsencrypt.org/docs/challenge-types/) using your DNS providers API, you must build a custom Docker image that includes the necessary DNS provider module.
+Caddy is a powerful and flexible web server, but its official Docker images do not include DNS provider modules by default. To solve ACME [DNS-01 challenges](https://letsencrypt.org/docs/challenge-types/) using your DNS providers API, you must build a custom Docker image that includes the necessary DNS provider module.
 
 This repository automates the process of building and maintaining a Docker image of Caddy with the [`namedotcom` DNS provider module](https://github.com/caddy-dns/namedotcom) pre-installed. By using this image, you can easily leverage Name.com’s DNS services without needing to customize the Caddy base image yourself.
 
