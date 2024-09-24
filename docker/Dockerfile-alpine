@@ -6,3 +6,7 @@ RUN xcaddy build \
 FROM caddy:2.8.4-alpine
 
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
+
+# Overwrite the OCI Image Specification source label to enable tools 
+# like Renovate and Dependabot to automatically provide release notes.
+LABEL org.opencontainers.image.source="https://github.com/caddyserver/caddy"
