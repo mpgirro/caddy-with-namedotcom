@@ -83,11 +83,11 @@ jobs:
           tags: |
             type=semver,pattern={{version}},value=${{ steps.version-extractor.outputs.CADDY_VERSION }}
             type=semver,pattern={{major}}.{{minor}},value=${{ steps.version-extractor.outputs.CADDY_VERSION }}
-            type=semver,pattern={{major}},value=${{ steps.version-extractor.outputs.CADDY_VERSION }}
-          #  type=sha  
-          #  type=schedule
-          #  type=ref,event=branch
-          #  type=ref,event=pr    
+            type=semver,pattern={{major}},value=${{ steps.version-extractor.outputs.CADDY_VERSION }} 
+          # Set the OCI Image Specification source label to the Caddy repository to enable tools 
+          # like Renovate and Dependabot to automatically fetch release notes for new versions.
+          labels: |
+            org.opencontainers.image.source=https://github.com/caddyserver/caddy
 
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
