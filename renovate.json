@@ -3,6 +3,7 @@
   "extends": [
     "config:recommended"
   ],
+  "assignees": ["mpgirro"],
   "prConcurrentLimit": 0,
   "prHourlyLimit": 0,
   "prCreation": "immediate",
