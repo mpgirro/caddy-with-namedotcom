@@ -21,8 +21,8 @@ Simply pull this image and use it as a drop-in replacement for the standard Cadd
 
 ## Image Locations
 
-- __Docker Hub__: `docker pull mpgirro/caddy-with-namedotcom`
-- __GitHub Container Registry__: `docker pull ghcr.io/mpgirro/caddy-with-namedotcom`
+- [__Docker Hub__](https://hub.docker.com/r/mpgirro/caddy-with-namedotcom): `docker pull mpgirro/caddy-with-namedotcom`
+- [__GitHub Container Registry__](https://github.com/mpgirro/caddy-with-namedotcom/pkgs/container/caddy-with-namedotcom): `docker pull ghcr.io/mpgirro/caddy-with-namedotcom`
 
 ## Filing Issues
 
