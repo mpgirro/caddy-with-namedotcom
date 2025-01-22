@@ -15,9 +15,7 @@
     {
       "matchDatasources": ["docker"],
       "updateTypes": ["major", "minor", "patch"],
-      "automerge": true,
-      "automergeType": "branch",
-      "ignoreTests": true
+      "automerge": true
     }
   ]
 }
