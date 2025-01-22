@@ -6,7 +6,6 @@
   "assignees": ["mpgirro"],
   "prConcurrentLimit": 0,
   "prHourlyLimit": 0,
-  "prCreation": "immediate",
   "rebaseWhen": "behind-base-branch",
   "recreateWhen": "always",
   "fetchChangeLogs": "pr",
