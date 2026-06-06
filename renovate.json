@@ -10,7 +10,14 @@
   "recreateWhen": "always",
   "fetchChangeLogs": "pr",
   "additionalBranchPrefix": "{{manager}}/",
+  "platformAutomerge": false,
   "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["caddy"],
+      "automerge": true,
+      "automergeType": "pr"
+    },
     {
       "matchDatasources": ["docker"],
       "updateTypes": ["major", "minor", "patch"],
