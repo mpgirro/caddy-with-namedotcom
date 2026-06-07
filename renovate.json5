@@ -1,0 +1,40 @@
+{
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  extends: ['config:recommended'],
+
+  // Maximilian reviews all Renovate PRs
+  reviewers: ['mpgirro'],
+
+  // No throttling — small repo, low PR volume
+  prConcurrentLimit: 0,
+  prHourlyLimit: 0,
+
+  // Keep PRs current with master; recreate if closed
+  rebaseWhen: 'behind-base-branch',
+  recreateWhen: 'always',
+
+  // Surface upstream changelogs in the PR body
+  fetchChangeLogs: 'pr',
+
+  // Branch names like `docker/caddy-2.x` instead of bare `caddy-2.x`
+  additionalBranchPrefix: '{{manager}}/',
+
+  // Use Renovate's own automerge, not GitHub's platform automerge
+  platformAutomerge: false,
+
+  packageRules: [
+    // Caddy image: auto-merge via PR (already covered by next rule, but explicit for clarity)
+    {
+      matchDatasources: ['docker'],
+      matchPackageNames: ['caddy'],
+      automerge: true,
+      automergeType: 'pr',
+    },
+    // All other Docker updates: auto-merge regardless of bump type
+    {
+      matchDatasources: ['docker'],
+      updateTypes: ['major', 'minor', 'patch'],
+      automerge: true,
+    },
+  ],
+}
