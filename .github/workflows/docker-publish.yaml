@@ -69,7 +69,8 @@ jobs:
       - name: Extract Caddy version
         id: version-extractor
         run: |
-          CADDY_VERSION=$(grep -oP '(\d+\.\d+\.\d+(-\w+(-\w+)*)?)' ${{ matrix.dockerfile }} | grep -vP 'builder' | head -n 1)
+          # Tag of the final stage, the only `FROM caddy:` line without `AS`
+          CADDY_VERSION=$(grep -oP '^FROM caddy:\K\S+$' ${{ matrix.dockerfile }})
           echo "Extracted Caddy version is: $CADDY_VERSION"
           echo "CADDY_VERSION=$CADDY_VERSION" >> "$GITHUB_OUTPUT"
 
