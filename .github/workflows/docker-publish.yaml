@@ -6,6 +6,9 @@ on:
     # Trigger on master branch only if changes are detected in the docker directory
     paths:
       - docker/**
+  pull_request:
+    paths:
+      - docker/**
   workflow_dispatch:
 
 jobs:
@@ -127,7 +130,7 @@ jobs:
           echo "IS_DEFAULT_BUILD=$IS_DEFAULT_BUILD" >> "$GITHUB_OUTPUT"
 
       - uses: softprops/action-gh-release@v2.5.0
-        if: ${{ steps.check-default-build.outputs.IS_DEFAULT_BUILD == 'true' }}
+        if: ${{ github.event_name != 'pull_request' && steps.check-default-build.outputs.IS_DEFAULT_BUILD == 'true' }}
         with:
           tag_name: ${{ steps.version-extractor.outputs.CADDY_VERSION }}
           body: |
