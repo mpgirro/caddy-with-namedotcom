@@ -23,17 +23,10 @@
   platformAutomerge: false,
 
   packageRules: [
-    // Caddy image: auto-merge via PR (already covered by next rule, but explicit for clarity)
+    // Docker updates (the caddy image): auto-merge once the PR build passes
     {
       matchDatasources: ['docker'],
-      matchPackageNames: ['caddy'],
-      automerge: true,
-      automergeType: 'pr',
-    },
-    // All other Docker updates: auto-merge regardless of bump type
-    {
-      matchDatasources: ['docker'],
-      updateTypes: ['major', 'minor', 'patch'],
+      matchUpdateTypes: ['major', 'minor', 'patch'],
       automerge: true,
     },
   ],
