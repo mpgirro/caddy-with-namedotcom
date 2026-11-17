@@ -1,0 +1,10 @@
+example.com {
+	tls {
+		dns namedotcom {
+			token dummy
+			user dummy
+			server https://api.name.com
+		}
+	}
+	respond "ok"
+}

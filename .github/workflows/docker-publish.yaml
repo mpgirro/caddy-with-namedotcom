@@ -10,7 +10,15 @@ on:
     paths:
       - docker/**
       - .github/workflows/docker-publish.yaml
+      - test/**
+  # Weekly rebuild picks up base image fixes and the unpinned caddy-dns/namedotcom module
+  schedule:
+    - cron: '0 4 * * 1'
   workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || 'publish' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   publish-image:
@@ -94,6 +102,20 @@ jobs:
           labels: |
             org.opencontainers.image.source=https://github.com/caddyserver/caddy
 
+      - name: Build amd64 image for smoke test
+        uses: docker/build-push-action@v6.19.2
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          platforms: linux/amd64
+          load: true
+          tags: smoke-test
+          cache-from: type=gha
+
+      # Fails if the binary does not start or dns.providers.namedotcom is missing
+      - name: Smoke test
+        run: docker run --rm --network none -v "$PWD/test/Caddyfile:/etc/caddy/Caddyfile:ro" smoke-test caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
+
       # Build and push Docker image with Buildx (don't push on PR)
       # https://github.com/docker/build-push-action
       - name: Build and push Docker image
@@ -132,7 +154,7 @@ jobs:
           echo "IS_DEFAULT_BUILD=$IS_DEFAULT_BUILD" >> "$GITHUB_OUTPUT"
 
       - uses: softprops/action-gh-release@v2.5.0
-        if: ${{ github.event_name != 'pull_request' && steps.check-default-build.outputs.IS_DEFAULT_BUILD == 'true' }}
+        if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && steps.check-default-build.outputs.IS_DEFAULT_BUILD == 'true' }}
         with:
           tag_name: ${{ steps.version-extractor.outputs.CADDY_VERSION }}
           body: |
