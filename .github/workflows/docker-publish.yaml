@@ -103,7 +103,7 @@ jobs:
             org.opencontainers.image.source=https://github.com/caddyserver/caddy
 
       - name: Build amd64 image for smoke test
-        uses: docker/build-push-action@v6.19.2
+        uses: docker/build-push-action@v7.4.0
         with:
           context: .
           file: ${{ matrix.dockerfile }}
