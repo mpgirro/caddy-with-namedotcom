@@ -153,7 +153,7 @@ jobs:
           echo "Is default version build job: $IS_DEFAULT_BUILD"
           echo "IS_DEFAULT_BUILD=$IS_DEFAULT_BUILD" >> "$GITHUB_OUTPUT"
 
-      - uses: softprops/action-gh-release@v2.6.2
+      - uses: softprops/action-gh-release@v3.0.4
         # Not skipped on schedule: a scheduled run can replace a queued push run in the concurrency group
         if: ${{ github.event_name != 'pull_request' && steps.check-default-build.outputs.IS_DEFAULT_BUILD == 'true' }}
         with:
