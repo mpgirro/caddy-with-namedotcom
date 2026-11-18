@@ -116,10 +116,11 @@ jobs:
       - name: Smoke test
         run: docker run --rm --network none -v "$PWD/test/Caddyfile:/etc/caddy/Caddyfile:ro" smoke-test caddy validate --config /etc/caddy/Caddyfile --adapter caddyfile
 
-      # Build and push Docker image with Buildx (don't push on PR)
+      # Build and push Docker image with Buildx (skipped on PR: the amd64 smoke test covers it)
       # https://github.com/docker/build-push-action
       - name: Build and push Docker image
         id: build-and-push
+        if: ${{ github.event_name != 'pull_request' }}
         uses: docker/build-push-action@v7.4.0
         with:
           context: .
